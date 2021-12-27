@@ -9,59 +9,50 @@ functionAnalysisResultArray functionAnalysisResults;
 
 void addFunctionUsage(functionUsage** arr, int* size, char* fileName, int line)
 {
-	if(*arr)
-	{
-		*arr = realloc(*arr, (*size + 1) * sizeof(**arr));
-	}
-	else
-	{
-		*arr = malloc(sizeof(**arr));
-	}
-	(*arr)[*size] = *createFunctionUsage(fileName, line);
-	++*size;
+	*arr = realloc(*arr, (*size + 1) * sizeof(**arr));
+	(*arr)[*size] = createFunctionUsage(fileName, line);
+	++* size;
 }
 
-functionUsage* createFunctionUsage(char* fileName, int line)
+functionUsage createFunctionUsage(char* fileName, int line)
 {
-	functionUsage* a = malloc(sizeof(*a));
-	a->fileName = malloc(strlen(fileName) * sizeof(*a->fileName));
-	strcpy(a->fileName, fileName);
-	a->line = line;
+	functionUsage a;
+	a.fileName = malloc((strlen(fileName) + 1) * sizeof(*a.fileName));
+	strcpy(a.fileName, fileName);
+	a.line = line;
 	return a;
 }
 
 int getFunctionIndex(char* name)
 {
-	for (int i = 0; i < functionAnalysisResults.functionsIndexes.size; ++i)
+	for (int i = 0; i < functionAnalysisResults.size; ++i)
 	{
-		if (strcmp(functionAnalysisResults.functionsIndexes.names[i], name) == 0)
+		if (strcmp(functionAnalysisResults.functionAnalysisResults[i].functionName, name) == 0)
 		{
 			return i;
 		}
 	}
-	return FUNTION_NOT_STORED;
-}
-
-void addFunctionToIndexing(char* name)
-{
-	functionAnalysisResults.functionsIndexes.names = realloc(functionAnalysisResults.functionsIndexes.names, functionAnalysisResults.functionsIndexes.size * sizeof(*functionAnalysisResults.functionsIndexes.names));
-	strcpy(functionAnalysisResults.functionsIndexes.names[functionAnalysisResults.functionsIndexes.size], name);
-	++functionAnalysisResults.functionsIndexes.size;
+	return FUNCTION_NOT_STORED;
 }
 
 void addFunctionAnalysisResult(char* functionName)
 {
 	int index;
-	if ((index = getFunctionIndex(functionName)) != FUNTION_NOT_STORED)
+	if ((index = getFunctionIndex(functionName)) != FUNCTION_NOT_STORED)
 	{
 		return;
 	}
 
 	functionAnalysisResult result;
 
-	result.functionName = malloc(strlen(functionName) * sizeof(*functionName));
+	result.functionName = malloc((strlen(functionName) + 1) * sizeof(*functionName));
 	strcpy(result.functionName, functionName);
-	addFunctionToIndexing(functionName);
+	result.functionUsages = NULL;
+	result.usagesAmount = 0;
+	result.lineWithDefinition = 0;
+	result.lineWithPrototype = 0;
+	result.definitionFileName = NULL;
+	result.prototypeFileName = NULL;
 
 	functionAnalysisResults.functionAnalysisResults = realloc(functionAnalysisResults.functionAnalysisResults, (functionAnalysisResults.size + 1) * sizeof(*functionAnalysisResults.functionAnalysisResults));
 	functionAnalysisResults.functionAnalysisResults[functionAnalysisResults.size] = result;
@@ -71,46 +62,66 @@ void addFunctionAnalysisResult(char* functionName)
 void freeFunctionAnalysisResult(functionAnalysisResult* a)
 {
 	free(a->functionName);
+	free(a->definitionFileName);
+	free(a->prototypeFileName);
 	if (a->functionUsages)
 	{
-		int i;
-		for (i = 0; i < a->usgaesAmount; ++i)
+		for (int i = 0; i < a->usagesAmount; ++i)
 		{
 			free(a->functionUsages[i].fileName);
 		}
 		free(a->functionUsages);
 	}
-	free(a);
 }
 functionAnalysisResult* getFunctionAnalysisResult(char* functionName)
 {
-	int index;
-	if ((index = getFunctionIndex(functionName)) != FUNTION_NOT_STORED)
-	{
-		return &functionAnalysisResults.functionAnalysisResults[index];
-	}
-	return NULL;
+	addFunctionAnalysisResult(functionName);
+	return &functionAnalysisResults.functionAnalysisResults[getFunctionIndex(functionName)];
 }
 
 
 void store_add_call(char* functionName, int line, char* fileName)
 {
 	functionAnalysisResult* a = getFunctionAnalysisResult(functionName);
-	addFunctionUsage(&a->functionUsages, &a->usgaesAmount, fileName, line);
+	addFunctionUsage(&a->functionUsages, &a->usagesAmount, fileName, line);
 }
 
 void store_add_proto(char* functionName, int line, char* fileName)
 {
 	functionAnalysisResult* a = getFunctionAnalysisResult(functionName);
 	a->lineWithPrototype = line;
-	a->prototypeFileName = fileName;
+	a->prototypeFileName = malloc((strlen(fileName) + 1) * sizeof(*a->prototypeFileName));
+	strcpy(a->prototypeFileName, fileName);
 }
 
 void store_add_def(char* functionName, int line, char* fileName)
 {
 	functionAnalysisResult* a = getFunctionAnalysisResult(functionName);
 	a->lineWithDefinition = line;
-	a->definitionFileName = fileName;
+	a->definitionFileName = malloc((strlen(fileName) + 1) * sizeof(*a->definitionFileName));
+	strcpy(a->definitionFileName, fileName);
+}
+
+void printFunctionAnalysisResult(void)
+{
+	for (int i = 0; i < functionAnalysisResults.size; i++)
+	{
+		printf("funkcja %s\n", functionAnalysisResults.functionAnalysisResults[i].functionName);
+
+		printf("\tprototyp: %s:%d\n", functionAnalysisResults.functionAnalysisResults[i].prototypeFileName,
+			functionAnalysisResults.functionAnalysisResults[i].lineWithPrototype + 1);
+
+		printf("\tdefinicja: %s:%d\n", functionAnalysisResults.functionAnalysisResults[i].definitionFileName,
+			functionAnalysisResults.functionAnalysisResults[i].lineWithDefinition + 1);
+
+		printf("\tuzycia (%d):\n", functionAnalysisResults.functionAnalysisResults[i].usagesAmount);
+
+		for (int j = 0; j < functionAnalysisResults.functionAnalysisResults[i].usagesAmount; j++)
+		{
+			printf("\t\t%d: %s:%d\n", j + 1, functionAnalysisResults.functionAnalysisResults[i].functionUsages[j].fileName,
+				functionAnalysisResults.functionAnalysisResults[i].functionUsages[j].line + 1);
+		}
+	}
 }
 
 void analizatorSkladni(char* inpname)
@@ -123,6 +134,8 @@ void analizatorSkladni(char* inpname)
 
 	alex_init4file(in);          // ustaw analizator leksykalny, aby czytał in
 
+	functionAnalysisResults.functionAnalysisResults = NULL;
+
 	lexem_t lex = alex_nextLexem();      // pobierz następny leksem
 	while (lex != EOFILE) {
 		switch (lex) {
@@ -132,11 +145,11 @@ void analizatorSkladni(char* inpname)
 			if (nlex == OPEPAR) {   // nawias otwierający - to zapewne funkcja
 				npar++;
 				put_on_fun_stack(npar, iname);       // odłóż na stos funkcji
-													  // stos f. jest niezbędny, aby poprawnie obsłużyć sytuacje typu
-													  // f1( 5, f2( a ), f3( b ) )
+				free(iname);						 // stos f. jest niezbędny, aby poprawnie obsłużyć sytuacje typu// f1( 5, f2( a ), f3( b ) )
 			}
 			else {                  // nie nawias, czyli nie funkcja
 				lex = nlex;
+				free(iname);
 				continue;
 			}
 		}
@@ -149,12 +162,17 @@ void analizatorSkladni(char* inpname)
 													// jeśli tak, to właśnie wczytany nawias jest domknięciem nawiasu otwartego
 													// za identyfikatorem znajdującym się na wierzchołku stosu
 				lexem_t nlex = alex_nextLexem();     // bierzemy nast leksem
+				char* functionNameBuf = get_from_fun_stack();
 				if (nlex == OPEBRA)   // nast. leksem to klamra a więc mamy do czynienia z def. funkcji
-					store_add_def(get_from_fun_stack(), alex_getLN(), inpname);
+				{
+					++nbra;
+					store_add_def(functionNameBuf, alex_getLN(), inpname);
+				}
 				else if (nbra == 0)   // nast. leksem to nie { i jesteśmy poza blokami - to musi być prototyp
-					store_add_proto(get_from_fun_stack(), alex_getLN(), inpname);
+					store_add_proto(functionNameBuf, alex_getLN(), inpname);
 				else                  // nast. leksem to nie { i jesteśmy wewnątrz bloku - to zapewne wywołanie
-					store_add_call(get_from_fun_stack(), alex_getLN(), inpname);
+					store_add_call(functionNameBuf, alex_getLN(), inpname);
+				free(functionNameBuf);
 			}
 			npar--;
 		}
@@ -177,4 +195,12 @@ void analizatorSkladni(char* inpname)
 		}
 		lex = alex_nextLexem();
 	}
+	printFunctionAnalysisResult();
+	fclose(in);
+	for (int i = 0; i < functionAnalysisResults.size; i++)
+	{
+		freeFunctionAnalysisResult(functionAnalysisResults.functionAnalysisResults + i);
+	}
+	free(functionAnalysisResults.functionAnalysisResults);
+	functionAnalysisResults.size = 0;
 }

@@ -1,7 +1,16 @@
 #include "alex.h"
 #include "parser.h"
 
+#include <stdlib.h>
+
 int main(int argv, char** argc)
 {
-	analizatorSkladni("jimp9.cpp");
+
+	if (argv != 2)
+	{
+		fprintf(stderr, "Nie poprawna liczba argumentow");
+		return EXIT_FAILURE;
+	}
+	analizatorSkladni(argc[1]);
+	return EXIT_SUCCESS;
 }

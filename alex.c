@@ -1,6 +1,7 @@
 #include "alex.h"
 
 #include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 
 static int  ln = 0;
@@ -32,10 +33,10 @@ int isKeyword(char* str)
 lexem_t alex_nextLexem(void) {
 	int c;
 	while ((c = fgetc(ci)) != EOF) {
-		if (isspace(c))
-			continue;
-		else if (c == '\n')
+		if (c == '\n')
 			ln++;
+		else if (isspace(c))
+			continue;
 		else if (c == '(')
 			return OPEPAR;
 		else if (c == ')')
@@ -47,9 +48,10 @@ lexem_t alex_nextLexem(void) {
 		else if (isalpha(c)) {
 			int i = 1;
 			ident[0] = c;
-			while (isalnum(c = fgetc(ci)))
+			while (isalnum(c = fgetc(ci)) || c == '_')
 				ident[i++] = c;
 			ident[i] = '\0';
+			ungetc(c, ci);
 			return isKeyword(ident) ? OTHER : IDENT;
 		}
 		else if (c == '"') {
@@ -64,7 +66,8 @@ lexem_t alex_nextLexem(void) {
 		}
 		else if (c == '/') {
 			/* moze byc komentarz */
-		} if (isdigit(c) || c == '.') {
+		}
+		if (isdigit(c) || c == '.') {
 			/* liczba */
 		}
 		else {
@@ -75,7 +78,9 @@ lexem_t alex_nextLexem(void) {
 }
 
 char* alex_ident(void) {
-	return ident;
+	char* result = malloc((strlen(ident) + 1) * sizeof(*ident));
+	strcpy(result, ident);
+	return result;
 }
 
 int alex_getLN() {

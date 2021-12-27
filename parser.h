@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-#define FUNTION_NOT_STORED -1
+#define FUNCTION_NOT_STORED -1
 
 typedef struct functionUsage
 {
@@ -21,6 +21,7 @@ typedef struct functionIndexesAssociation
 
 typedef struct functionAnalysisResult
 {
+
 	char* functionName;
 	char* prototypeFileName;
 	char* definitionFileName;
@@ -29,17 +30,16 @@ typedef struct functionAnalysisResult
 	int lineWithDefinition;
 
 	functionUsage* functionUsages;
-	int usgaesAmount;
+	int usagesAmount;
 } functionAnalysisResult;
 
 typedef struct functionAnalysisResultArray
 {
-	functionIndexesAssociation functionsIndexes;
 	functionAnalysisResult* functionAnalysisResults;
 	int size;
 } functionAnalysisResultArray;
 
-functionUsage* createFunctionUsage(char* fileName, int line);
+functionUsage createFunctionUsage(char* fileName, int line);
 
 void addFunctionUsage(functionUsage** arr, int* size, char* fileName, int line);
 

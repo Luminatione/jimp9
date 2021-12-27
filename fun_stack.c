@@ -4,38 +4,40 @@
 
 #include "fun_stack.h"
 
-struct funstack *first;
+struct funstack* first;
 
 int top_of_funstack(void)
 {
-    if(first != NULL) return first->par_level;
+	if (first != NULL) return first->par_level;
 
-    else return 1;
+	else return 1;
 }
 
-void put_on_fun_stack( int par_level, char *funame )
+void put_on_fun_stack(int par_level, char* funame)
 {
-    struct funstack *stack = NULL;
-    stack = malloc(sizeof (struct funstack));
+	struct funstack* stack = NULL;
+	stack = malloc(sizeof(struct funstack));
 
-    stack->funame = (char*) malloc((strlen(funame)+1) * sizeof(stack->funame)); //dodaje jedno miejsce dla znaku białego
-    strcpy(stack->funame, funame);
+	stack->funame = (char*)malloc((strlen(funame) + 1) * sizeof(*stack->funame)); //dodaje jedno miejsce dla znaku białego
+	strcpy(stack->funame, funame);
 
-    stack->par_level = par_level;
+	stack->par_level = par_level;
 
-    stack->previous = first;
+	stack->previous = first;
 
-    first = stack;
+	first = stack;
 }
 
-char *get_from_fun_stack(void)
+char* get_from_fun_stack(void)
 {
-    if(first == NULL) return 1;
+	if (first == NULL) return 1;
 
-    char *temp;
+	char* temp;
 
-    temp = first->funame;
-    first = first->previous;
+	temp = first->funame;
+	struct funstack* buf = first;
+	first = first->previous;
+	free(buf);
 
-    return temp;
+	return temp;
 }
