@@ -8,7 +8,7 @@ int main(int argv, char** argc)
 
 	if (argv != 2)
 	{
-		fprintf(stderr, "Nie poprawna liczba argumentow");
+		fprintf(stderr, "Niepoprawna liczba argumentow");
 		return EXIT_FAILURE;
 	}
 	analizatorSkladni(argc[1]);

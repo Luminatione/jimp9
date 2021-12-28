@@ -6,7 +6,7 @@
 
 struct funstack* first;
 
-int top_of_funstack(void)
+int top_of_fun_stack(void)
 {
 	if (first != NULL) return first->par_level;
 
@@ -30,7 +30,7 @@ void put_on_fun_stack(int par_level, char* funame)
 
 char* get_from_fun_stack(void)
 {
-	if (first == NULL) return 1;
+	if (first == NULL) return 0;
 
 	char* temp;
 

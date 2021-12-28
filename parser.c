@@ -158,7 +158,7 @@ void analizatorSkladni(char* inpname)
 			npar++;
 			break;
 		case CLOPAR: {              // zamykający nawias - to może być koniec prototypu, nagłówka albo wywołania
-			if (top_of_funstack() == npar) {       // sprawdzamy, czy liczba nawiasów bilansuje się z wierzchołkiem stosu funkcji
+			if (top_of_fun_stack() == npar) {       // sprawdzamy, czy liczba nawiasów bilansuje się z wierzchołkiem stosu funkcji
 													// jeśli tak, to właśnie wczytany nawias jest domknięciem nawiasu otwartego
 													// za identyfikatorem znajdującym się na wierzchołku stosu
 				lexem_t nlex = alex_nextLexem();     // bierzemy nast leksem
