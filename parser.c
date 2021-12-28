@@ -163,6 +163,10 @@ void analizatorSkladni(char* inpname)
 													// za identyfikatorem znajdującym się na wierzchołku stosu
 				lexem_t nlex = alex_nextLexem();     // bierzemy nast leksem
 				char* functionNameBuf = get_from_fun_stack();
+				if(!functionNameBuf)
+				{
+					break;
+				}
 				if (nlex == OPEBRA)   // nast. leksem to klamra a więc mamy do czynienia z def. funkcji
 				{
 					++nbra;

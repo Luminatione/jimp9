@@ -19,8 +19,7 @@ int isKeyword(char* str)
 						"case", "const", "continue", "default", "if", "else", "enum", "extern",
 						"static", "signed", "goto", "inline", "short", "long", "struct", "typedef",
 						"union", "unsigned", "char", "double", "float", "int" };
-	int i;
-	for (i = 0; i < sizeof(keywords) / sizeof(keywords[0]); ++i)
+	for (size_t i = 0; i < sizeof(keywords) / sizeof(keywords[0]); ++i)
 	{
 		if (strcmp(str, keywords[i]) == 0)
 		{
@@ -62,6 +61,7 @@ lexem_t alex_nextLexem(void) {
 			while ((c = fgetc(ci)) != EOF && c != '"' && cp == '\\') {
 				cp = c;
 			}
+			ungetc(c, ci);
 			return c == EOF ? EOFILE : OTHER;
 		}
 		else if (c == '/') {

@@ -8,9 +8,9 @@ struct funstack* first;
 
 int top_of_fun_stack(void)
 {
-	if (first != NULL) return first->par_level;
-
-	else return 1;
+	if (first != NULL) 
+		return first->par_level;
+	return 0;
 }
 
 void put_on_fun_stack(int par_level, char* funame)

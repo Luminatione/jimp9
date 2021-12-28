@@ -3,8 +3,7 @@
 
 #include <stdlib.h>
 
-int main(int argv, char** argc)
-{
+int main(int argv, char** argc){
 
 	if (argv != 2)
 	{
