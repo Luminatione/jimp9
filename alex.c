@@ -33,7 +33,10 @@ lexem_t alex_nextLexem(void) {
 	int c;
 	while ((c = fgetc(ci)) != EOF) {
 		if (c == '\n')
+		{
 			ln++;
+			continue;
+		}
 		else if (isspace(c))
 			continue;
 		else if (c == '(')
@@ -44,7 +47,7 @@ lexem_t alex_nextLexem(void) {
 			return OPEBRA;
 		else if (c == '}')
 			return CLOBRA;
-		else if (isalpha(c)) {
+		else if (isalpha(c) || c == '_') {
 			int i = 1;
 			ident[0] = c;
 			while (isalnum(c = fgetc(ci)) || c == '_')
